@@ -1,0 +1,110 @@
+/* pages/index/index.wxss */
+
+/* 快速添加区域 */
+.quick-add {
+  margin-bottom: 32rpx;
+}
+
+.input-area {
+  margin-top: 16rpx;
+}
+
+.input-footer {
+  align-items: center;
+}
+
+/* 记录列表 */
+.records-section {
+  flex: 1;
+}
+
+.section-header {
+  padding: 0 8rpx;
+}
+
+.record-item {
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.record-item:active {
+  transform: scale(0.98);
+  background-color: #F8F8F8;
+}
+
+.record-content {
+  word-break: break-all;
+  line-height: 1.6;
+}
+
+.record-meta {
+  border-top: 1rpx solid #F0F0F0;
+  padding-top: 16rpx;
+  margin-top: 16rpx;
+}
+
+/* 模态框样式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal {
+  background-color: #FFFFFF;
+  border-radius: 16rpx;
+  margin: 40rpx;
+  width: calc(100% - 80rpx);
+  max-width: 600rpx;
+  animation: slideUp 0.3s ease-out;
+}
+
+.modal-header {
+  padding: 32rpx 32rpx 16rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+
+.modal-body {
+  padding: 24rpx 32rpx;
+}
+
+.modal-footer {
+  padding: 16rpx 32rpx 32rpx;
+  gap: 16rpx;
+}
+
+/* 动画 */
+@keyframes slideUp {
+  from {
+    transform: translateY(100rpx);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 响应式优化 */
+@media (max-width: 750rpx) {
+  .container {
+    padding: 16rpx;
+  }
+  
+  .card {
+    padding: 20rpx;
+  }
+  
+  .modal {
+    margin: 20rpx;
+    width: calc(100% - 40rpx);
+  }
+} 

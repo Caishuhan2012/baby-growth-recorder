@@ -1,0 +1,73 @@
+/* pages/add/add.wxss */
+
+.add-form {
+  margin-bottom: 24rpx;
+}
+
+.form-item {
+  margin-bottom: 16rpx;
+}
+
+.char-count {
+  text-align: right;
+}
+
+.form-actions {
+  gap: 16rpx;
+}
+
+/* 快捷操作 */
+.quick-actions {
+  margin-bottom: 24rpx;
+}
+
+.quick-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.quick-btn {
+  background-color: #F8F9FA;
+  color: #666666;
+  border: 1rpx solid #E8E8E8;
+  border-radius: 20rpx;
+  padding: 12rpx 24rpx;
+  font-size: 26rpx;
+  line-height: 1.2;
+  margin: 0;
+  transition: all 0.2s ease;
+}
+
+.quick-btn:active {
+  background-color: #FF6B35;
+  color: #FFFFFF;
+  border-color: #FF6B35;
+  transform: scale(0.95);
+}
+
+/* 使用提示 */
+.tips {
+  opacity: 0.8;
+}
+
+.tip-list {
+  space: 12rpx;
+}
+
+.tip-item {
+  margin-bottom: 12rpx;
+  line-height: 1.5;
+}
+
+.tip-item:last-child {
+  margin-bottom: 0;
+}
+
+/* 响应式优化 */
+@media (max-width: 750rpx) {
+  .quick-btn {
+    font-size: 24rpx;
+    padding: 10rpx 20rpx;
+  }
+} 

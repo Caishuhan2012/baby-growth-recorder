@@ -1,0 +1,120 @@
+<!--pages/detail/detail.wxml-->
+<view class="container">
+  <!-- 记录内容 -->
+  <view class="detail-content card" wx:if="{{record}}">
+    <view class="content-header flex-between mb-24">
+      <text class="title">记录详情</text>
+      <button 
+        class="btn-secondary small" 
+        bindtap="editRecord"
+        wx:if="{{!isEditing}}"
+      >
+        编辑
+      </button>
+    </view>
+
+    <view class="content-body">
+      <!-- 查看模式 -->
+      <view wx:if="{{!isEditing}}">
+        <text class="text content-text">{{record.content}}</text>
+      </view>
+
+      <!-- 编辑模式 -->
+      <view wx:else>
+        <textarea 
+          class="textarea edit-textarea"
+          value="{{editContent}}"
+          bindinput="onEditInput"
+          auto-height
+          maxlength="1000"
+          focus="{{true}}"
+          placeholder="请输入内容..."
+        ></textarea>
+        <view class="char-count text-small mt-16">
+          {{editContent.length}}/1000
+        </view>
+        
+        <view class="edit-actions flex mt-24">
+          <button 
+            class="btn-secondary flex-1 mr-16" 
+            bindtap="cancelEdit"
+          >
+            取消
+          </button>
+          <button 
+            class="btn-primary flex-1" 
+            bindtap="saveEdit"
+            disabled="{{!editContent.trim()}}"
+          >
+            保存
+          </button>
+        </view>
+      </view>
+    </view>
+
+    <!-- 时间信息 -->
+    <view class="time-info mt-24">
+      <view class="time-item">
+        <text class="text-secondary">创建时间：{{record.createTimeText}}</text>
+      </view>
+      <view class="time-item" wx:if="{{record.updateTimeText !== record.createTimeText}}">
+        <text class="text-secondary">最后编辑：{{record.updateTimeText}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="actions card" wx:if="{{record && !isEditing}}">
+    <view class="subtitle mb-16">操作</view>
+    <view class="action-buttons">
+      <button 
+        class="action-btn" 
+        bindtap="copyContent"
+      >
+        <text class="action-icon">📋</text>
+        <text class="action-text">复制内容</text>
+      </button>
+      
+      <button 
+        class="action-btn" 
+        bindtap="shareRecord"
+      >
+        <text class="action-icon">📤</text>
+        <text class="action-text">分享记录</text>
+      </button>
+      
+      <button 
+        class="action-btn danger" 
+        bindtap="showDeleteConfirm"
+      >
+        <text class="action-icon">🗑️</text>
+        <text class="action-text">删除记录</text>
+      </button>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading" wx:if="{{!record}}">
+    <view class="loading-text">加载中...</view>
+  </view>
+</view>
+
+<!-- 删除确认模态框 -->
+<view class="modal-overlay" wx:if="{{showDeleteModal}}" bindtap="hideDeleteModal">
+  <view class="modal" catchtap="preventClose">
+    <view class="modal-header">
+      <text class="title">确认删除</text>
+    </view>
+    <view class="modal-body">
+      <text class="text">确定要删除这条记录吗？删除后无法恢复。</text>
+    </view>
+    <view class="modal-footer flex">
+      <button class="btn-secondary flex-1 mr-16" bindtap="hideDeleteModal">
+        取消
+      </button>
+      <button class="btn-danger flex-1" bindtap="confirmDelete">
+        删除
+      </button>
+    </view>
+  </view>
+</view> 

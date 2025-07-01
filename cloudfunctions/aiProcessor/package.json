@@ -1,0 +1,11 @@
+{
+  "name": "aiProcessor",
+  "version": "1.0.0",
+  "description": "AI处理云函数，集成图像识别和文本生成",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "axios": "^1.6.0",
+    "tencentcloud-sdk-nodejs": "^4.0.0"
+  }
+} 

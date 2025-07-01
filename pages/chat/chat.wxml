@@ -1,0 +1,164 @@
+<!--pages/chat/chat.wxml-->
+<view class="container">
+  <!-- 页面头部 -->
+  <view class="header">
+    <view class="header-title">
+      <text class="title">聊天记录</text>
+      <text class="subtitle">通过微信聊天生成的成长记录</text>
+    </view>
+    <view class="header-stats">
+      <text class="stats">共 {{chatRecords.length}} 条记录</text>
+    </view>
+  </view>
+
+  <!-- 聊天记录列表 -->
+  <view class="chat-list">
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{chatRecords.length === 0}}">
+      <image class="empty-icon" src="/images/empty-chat.png" mode="aspectFit"></image>
+      <text class="empty-text">还没有聊天记录</text>
+      <text class="empty-desc">向助理微信号发送宝宝照片+描述开始记录吧</text>
+      <button class="empty-btn" bindtap="showChatGuide">查看使用教程</button>
+    </view>
+
+    <!-- 记录列表 -->
+    <view class="chat-item" wx:for="{{chatRecords}}" wx:key="_id" bindtap="viewChatDetail" data-id="{{item._id}}">
+      <!-- 消息气泡 -->
+      <view class="message-bubble">
+        <!-- 用户消息 -->
+        <view class="user-message">
+          <view class="message-content">
+            <view class="message-image" wx:if="{{item.imageUrl}}">
+              <image src="{{item.imageUrl}}" mode="aspectFill"></image>
+            </view>
+            <text class="message-text">{{item.originalText}}</text>
+          </view>
+          <view class="message-time">{{item.timeText}}</view>
+        </view>
+
+        <!-- AI回复 -->
+        <view class="ai-message">
+          <view class="ai-avatar">
+            <text class="ai-icon">🤖</text>
+          </view>
+          <view class="ai-content">
+            <view class="ai-story">
+              <text class="story-text">{{item.story}}</text>
+            </view>
+            <view class="ai-tags">
+              <text class="tag" wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this">{{tag}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 处理状态 -->
+      <view class="process-status" wx:if="{{item.status}}">
+        <view class="status-item {{item.status === 'processing' ? 'processing' : 'completed'}}">
+          <view class="status-icon">
+            <view class="spinner" wx:if="{{item.status === 'processing'}}"></view>
+            <text class="check" wx:else>✓</text>
+          </view>
+          <text class="status-text">
+            {{item.status === 'processing' ? 'AI正在生成故事...' : '处理完成'}}
+          </text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 微信助手模拟器 -->
+  <view class="simulator-section">
+    <view class="simulator-header" bindtap="toggleSimulator">
+      <text class="simulator-title">📱 微信助手模拟器</text>
+      <text class="simulator-toggle">{{showSimulator ? '收起' : '展开'}}</text>
+    </view>
+    
+    <view class="simulator-content" wx:if="{{showSimulator}}">
+      <view class="simulator-form">
+        <view class="form-item">
+          <text class="form-label">选择照片</text>
+          <view class="image-picker" bindtap="simulateChooseImage">
+            <image wx:if="{{simulatorImagePath}}" src="{{simulatorImagePath}}" mode="aspectFill"></image>
+            <view wx:else class="image-placeholder">
+              <text class="placeholder-icon">📷</text>
+              <text class="placeholder-text">点击选择图片</text>
+            </view>
+          </view>
+        </view>
+        
+        <view class="form-item">
+          <text class="form-label">描述内容</text>
+          <textarea 
+            class="form-textarea" 
+            placeholder="输入宝宝照片的描述..."
+            value="{{simulatorText}}"
+            bindinput="onSimulatorTextInput"
+            maxlength="200"
+          ></textarea>
+        </view>
+        
+        <button 
+          class="simulator-btn {{simulatorImagePath && simulatorText ? 'active' : 'disabled'}}" 
+          bindtap="simulateWechatMessage"
+          disabled="{{!simulatorImagePath || !simulatorText}}"
+        >
+          🚀 模拟发送到微信助手
+        </button>
+      </view>
+      
+      <view class="simulator-tip">
+        <text class="tip-title">💡 模拟器说明</text>
+        <text class="tip-desc">此功能模拟微信聊天发送图片的完整流程，包括AI处理和故事生成</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 使用教程模态框 -->
+  <view class="modal-overlay" wx:if="{{showGuide}}" bindtap="hideGuide">
+    <view class="guide-modal" catchtap="preventClose">
+      <view class="guide-header">
+        <text class="guide-title">使用教程</text>
+        <text class="guide-close" bindtap="hideGuide">×</text>
+      </view>
+      
+      <view class="guide-content">
+        <view class="guide-step">
+          <view class="step-number">1</view>
+          <view class="step-content">
+            <text class="step-title">添加助理微信</text>
+            <text class="step-desc">扫描二维码添加智能助理为好友</text>
+          </view>
+        </view>
+        
+        <view class="guide-step">
+          <view class="step-number">2</view>
+          <view class="step-content">
+            <text class="step-title">发送照片+描述</text>
+            <text class="step-desc">向助理发送宝宝照片和简单描述</text>
+          </view>
+        </view>
+        
+        <view class="guide-step">
+          <view class="step-number">3</view>
+          <view class="step-content">
+            <text class="step-title">AI自动生成</text>
+            <text class="step-desc">AI将为你生成优雅的成长故事</text>
+          </view>
+        </view>
+        
+        <view class="guide-step">
+          <view class="step-number">4</view>
+          <view class="step-content">
+            <text class="step-title">同步到时光轴</text>
+            <text class="step-desc">故事自动同步到小程序时光轴</text>
+          </view>
+        </view>
+      </view>
+      
+      <view class="guide-footer">
+        <button class="guide-btn" bindtap="hideGuide">知道了</button>
+      </view>
+    </view>
+  </view>
+</view> 

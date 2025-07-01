@@ -1,0 +1,19 @@
+{
+  "pages": [
+    "pages/timeline/timeline",
+    "pages/chat/chat",
+    "pages/detail/detail",
+    "pages/settings/settings"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#FF6B9D",
+    "navigationBarTitleText": "宝宝成长记录",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#FFF5F8"
+  },
+  "cloud": true,
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+} 

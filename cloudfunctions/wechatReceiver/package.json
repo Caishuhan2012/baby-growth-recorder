@@ -1,0 +1,11 @@
+{
+  "name": "wechatReceiver",
+  "version": "1.0.0",
+  "description": "微信公众号消息接收处理云函数",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "wechat-api": "^1.35.1",
+    "crypto": "^1.0.1"
+  }
+} 

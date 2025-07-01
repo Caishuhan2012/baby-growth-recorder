@@ -1,0 +1,94 @@
+<!--pages/index/index.wxml-->
+<view class="container">
+  <!-- 头部快速添加区域 -->
+  <view class="quick-add card">
+    <view class="title">快速记录</view>
+    <view class="input-area">
+      <textarea 
+        class="textarea" 
+        placeholder="写下你想记录的内容..."
+        value="{{inputValue}}"
+        bindinput="onInput"
+        auto-height
+        maxlength="500"
+      ></textarea>
+      <view class="input-footer flex-between mt-16">
+        <text class="text-small">{{inputValue.length}}/500</text>
+        <view class="flex">
+          <button 
+            class="btn-secondary mr-16" 
+            bindtap="goToAdd"
+          >
+            详细添加
+          </button>
+          <button 
+            class="btn-primary" 
+            bindtap="addRecord"
+            disabled="{{!inputValue.trim()}}"
+          >
+            记录
+          </button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 记录列表 -->
+  <view class="records-section">
+    <view class="section-header flex-between mb-24">
+      <text class="subtitle">最近记录 ({{records.length}})</text>
+      <text class="text-small" wx:if="{{records.length > 0}}">
+        长按可删除
+      </text>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{records.length === 0}}">
+      <text class="empty-icon">📝</text>
+      <view class="empty-text">暂无记录，快来写下第一条吧！</view>
+    </view>
+
+    <!-- 记录列表 -->
+    <view class="records-list" wx:else>
+      <view 
+        class="record-item card fade-in" 
+        wx:for="{{records}}" 
+        wx:key="id"
+        bindtap="viewDetail"
+        bindlongpress="showDeleteConfirm"
+        data-id="{{item.id}}"
+        data-index="{{index}}"
+      >
+        <view class="record-content">
+          <text class="text">{{item.content}}</text>
+        </view>
+        <view class="record-meta flex-between mt-16">
+          <text class="text-small">{{item.timeText}}</text>
+          <text class="text-small" wx:if="{{item.updateTime !== item.createTime}}">
+            已编辑
+          </text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 删除确认模态框 -->
+<view class="modal-overlay" wx:if="{{showDeleteModal}}" bindtap="hideDeleteModal">
+  <view class="modal" catchtap="preventClose">
+    <view class="modal-header">
+      <text class="title">确认删除</text>
+    </view>
+    <view class="modal-body">
+      <text class="text">确定要删除这条记录吗？删除后无法恢复。</text>
+    </view>
+    <view class="modal-footer flex">
+      <button class="btn-secondary flex-1 mr-16" bindtap="hideDeleteModal">
+        取消
+      </button>
+      <button class="btn-danger flex-1" bindtap="confirmDelete">
+        删除
+      </button>
+    </view>
+  </view>
+</view> 

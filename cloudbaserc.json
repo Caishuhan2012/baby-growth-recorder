@@ -1,0 +1,16 @@
+{
+  "envId": "cloudbase-0glb0vskfee24f53",
+  "framework": {
+    "name": "wechat-server",
+    "plugins": {
+      "node": {
+        "use": "@cloudbase/framework-plugin-node",
+        "inputs": {
+          "entry": "server/index.js",
+          "name": "wechat-server",
+          "path": "/server"
+        }
+      }
+    }
+  }
+} 

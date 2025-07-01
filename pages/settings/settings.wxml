@@ -1,0 +1,195 @@
+<!--pages/settings/settings.wxml-->
+<view class="container">
+  <!-- 用户信息区域 -->
+  <view class="user-section">
+    <view class="user-avatar" bindtap="getUserInfo">
+      <image wx:if="{{userInfo.avatarUrl}}" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+      <text wx:else class="avatar-placeholder">👤</text>
+    </view>
+    <view class="user-info">
+      <text class="user-name">{{userInfo.nickName || '点击登录'}}</text>
+      <text class="user-desc">{{loginStatus}}</text>
+    </view>
+  </view>
+
+  <!-- 宝宝信息设置 -->
+  <view class="setting-section">
+    <view class="section-title">宝宝信息</view>
+    
+    <view class="setting-item" bindtap="setBabyName">
+      <view class="item-content">
+        <text class="item-label">宝宝昵称</text>
+        <text class="item-value">{{babyInfo.name}}</text>
+      </view>
+      <text class="item-arrow">></text>
+    </view>
+    
+    <view class="setting-item" bindtap="setBabyBirthday">
+      <view class="item-content">
+        <text class="item-label">出生日期</text>
+        <text class="item-value">{{babyInfo.birthday || '请设置'}}</text>
+      </view>
+      <text class="item-arrow">></text>
+    </view>
+    
+    <view class="setting-item" bindtap="setBabyGender">
+      <view class="item-content">
+        <text class="item-label">性别</text>
+        <text class="item-value">{{babyGenderText}}</text>
+      </view>
+      <text class="item-arrow">></text>
+    </view>
+    
+    <view class="baby-age" wx:if="{{babyAge.years >= 0}}">
+      <text class="age-text">宝宝现在 {{babyAge.years}} 岁 {{babyAge.months}} 个月</text>
+    </view>
+  </view>
+
+  <!-- AI设置 -->
+  <view class="setting-section">
+    <view class="section-title">AI设置</view>
+    
+    <view class="setting-item">
+      <view class="item-content">
+        <text class="item-label">故事风格</text>
+        <text class="item-value">{{storyStyle}}</text>
+      </view>
+      <text class="item-arrow">></text>
+    </view>
+    
+    <view class="setting-item">
+      <view class="item-content">
+        <text class="item-label">故事长度</text>
+        <text class="item-value">{{storyLength}}字</text>
+      </view>
+      <text class="item-arrow">></text>
+    </view>
+    
+    <view class="setting-item">
+      <view class="item-content">
+        <text class="item-label">智能分类</text>
+        <text class="item-desc">自动为记录添加标签</text>
+      </view>
+      <switch checked="{{autoTagging}}" bindchange="toggleAutoTagging" color="#FF6B9D"/>
+    </view>
+  </view>
+
+  <!-- 数据管理 -->
+  <view class="setting-section">
+    <view class="section-title">数据管理</view>
+    
+    <view class="setting-item" bindtap="exportData">
+      <view class="item-content">
+        <text class="item-label">导出数据</text>
+        <text class="item-desc">导出所有成长记录</text>
+      </view>
+      <text class="item-arrow">></text>
+    </view>
+    
+    <view class="setting-item" bindtap="backupData">
+      <view class="item-content">
+        <text class="item-label">备份数据</text>
+        <text class="item-desc">备份到云端</text>
+      </view>
+      <text class="item-arrow">></text>
+    </view>
+    
+    <view class="setting-item" bindtap="clearData">
+      <view class="item-content">
+        <text class="item-label">清除数据</text>
+        <text class="item-desc">删除所有本地数据</text>
+      </view>
+      <text class="item-arrow">></text>
+    </view>
+  </view>
+
+  <!-- 应用设置 -->
+  <view class="setting-section">
+    <view class="section-title">应用设置</view>
+    
+    <view class="setting-item" bindtap="checkUpdate">
+      <view class="item-content">
+        <text class="item-label">检查更新</text>
+        <text class="item-value">v{{version}}</text>
+      </view>
+      <text class="item-arrow">></text>
+    </view>
+    
+    <view class="setting-item" bindtap="showAbout">
+      <view class="item-content">
+        <text class="item-label">关于我们</text>
+        <text class="item-desc">应用信息与隐私政策</text>
+      </view>
+      <text class="item-arrow">></text>
+    </view>
+    
+    <view class="setting-item" bindtap="contactUs">
+      <view class="item-content">
+        <text class="item-label">意见反馈</text>
+        <text class="item-desc">问题反馈与建议</text>
+      </view>
+      <text class="item-arrow">></text>
+    </view>
+  </view>
+
+  <!-- 宝宝昵称设置模态框 -->
+  <view class="modal-overlay" wx:if="{{showNameModal}}" bindtap="hideNameModal">
+    <view class="modal" catchtap="preventClose">
+      <view class="modal-header">
+        <text class="modal-title">设置宝宝昵称</text>
+        <text class="modal-close" bindtap="hideNameModal">×</text>
+      </view>
+      
+      <view class="modal-body">
+        <input 
+          class="name-input"
+          placeholder="请输入宝宝昵称"
+          value="{{tempBabyName}}"
+          bindinput="onNameInput"
+          maxlength="10"
+        />
+      </view>
+      
+      <view class="modal-footer">
+        <button class="btn-cancel" bindtap="hideNameModal">取消</button>
+        <button class="btn-confirm" bindtap="confirmBabyName">确定</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 性别选择模态框 -->
+  <view class="modal-overlay" wx:if="{{showGenderModal}}" bindtap="hideGenderModal">
+    <view class="modal" catchtap="preventClose">
+      <view class="modal-header">
+        <text class="modal-title">选择性别</text>
+        <text class="modal-close" bindtap="hideGenderModal">×</text>
+      </view>
+      
+      <view class="modal-body">
+        <view class="gender-options">
+          <view 
+            class="gender-option {{tempGender === 'boy' ? 'selected' : ''}}"
+            bindtap="selectGender"
+            data-gender="boy"
+          >
+            <text class="gender-icon">👦</text>
+            <text class="gender-text">男孩</text>
+          </view>
+          <view 
+            class="gender-option {{tempGender === 'girl' ? 'selected' : ''}}"
+            bindtap="selectGender"
+            data-gender="girl"
+          >
+            <text class="gender-icon">👧</text>
+            <text class="gender-text">女孩</text>
+          </view>
+        </view>
+      </view>
+      
+      <view class="modal-footer">
+        <button class="btn-cancel" bindtap="hideGenderModal">取消</button>
+        <button class="btn-confirm" bindtap="confirmGender">确定</button>
+      </view>
+    </view>
+  </view>
+</view> 
