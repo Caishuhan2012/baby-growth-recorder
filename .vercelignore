@@ -1,0 +1,14 @@
+node_modules
+.git
+*.log
+.env.local
+.env
+*.md
+!README.md
+test_*
+verify_*
+云*.md
+微信*.md
+使用*.md
+快速*.md
+GitHub*.md 

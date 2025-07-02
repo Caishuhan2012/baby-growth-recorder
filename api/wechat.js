@@ -6,6 +6,12 @@ const WECHAT_TOKEN = 'babyGrowthRecord2024'
 export default function handler(req, res) {
   const { method, query, headers, url } = req
   
+  // 强制设置200状态码和正确的响应头
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8')
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  
   // 记录详细日志
   console.log(`=== 微信接口请求开始 ===`)
   console.log(`时间: ${new Date().toISOString()}`)
@@ -14,8 +20,12 @@ export default function handler(req, res) {
   console.log(`Query:`, query)
   console.log(`Headers:`, JSON.stringify(headers, null, 2))
   
-  // 设置响应头
-  res.setHeader('Content-Type', 'text/plain; charset=utf-8')
+  // 处理OPTIONS预检请求
+  if (method === 'OPTIONS') {
+    console.log('🔧 处理OPTIONS预检请求')
+    console.log('=== 微信接口请求结束 ===\n')
+    return res.status(200).end()
+  }
   
   // 处理GET请求（微信验证）
   if (method === 'GET') {
@@ -39,6 +49,7 @@ export default function handler(req, res) {
     // 检查是否有完整的验证参数
     if (!signature || !timestamp || !nonce || !echostr) {
       console.log('❌ 验证参数不完整')
+      console.log(`- 缺少参数: ${!signature ? 'signature ' : ''}${!timestamp ? 'timestamp ' : ''}${!nonce ? 'nonce ' : ''}${!echostr ? 'echostr' : ''}`)
       console.log('=== 微信接口请求结束 ===\n')
       return res.status(200).send('Missing verification parameters')
     }
@@ -71,6 +82,7 @@ export default function handler(req, res) {
       }
     } catch (error) {
       console.error('💥 验证过程异常:', error)
+      console.error('💥 错误堆栈:', error.stack)
       console.log('=== 微信接口请求结束 ===\n')
       return res.status(200).send('Internal server error')
     }

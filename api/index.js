@@ -160,9 +160,9 @@ export default async function handler(req, res) {
     }
   }
   
-  // 404处理
+  // 404处理 - 但返回200状态码避免微信验证失败
   console.log('404 - 未找到路径:', path)
-  return res.status(404).json({
+  return res.status(200).json({
     error: 'NOT_FOUND',
     message: `API路径 ${path} 未找到`,
     availableEndpoints: [
