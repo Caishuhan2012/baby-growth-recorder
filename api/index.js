@@ -13,6 +13,7 @@ export default async function handler(req, res) {
   
   console.log(`${new Date().toISOString()} - ${method} ${path}`)
   console.log('Query:', query)
+  console.log('Headers:', req.headers)
   
   // 设置CORS
   res.setHeader('Access-Control-Allow-Origin', '*')
@@ -66,9 +67,25 @@ export default async function handler(req, res) {
       
       const { signature, timestamp, nonce, echostr } = query
       
+      // 检查是否有微信验证参数
+      if (!signature && !timestamp && !nonce && !echostr) {
+        // 直接访问，返回错误信息但状态码200
+        console.log('❌ 直接访问微信接口，没有验证参数')
+        return res.status(200).json({
+          error: 'MISSING_PARAMS',
+          message: '这是微信公众号验证接口，需要微信服务器调用',
+          note: '请在微信公众号后台配置此URL进行验证'
+        })
+      }
+      
       if (!signature || !timestamp || !nonce || !echostr) {
-        console.log('❌ 缺少验证参数')
-        return res.status(403).send('验证失败：缺少必要参数')
+        console.log('❌ 缺少部分验证参数')
+        return res.status(400).json({
+          error: 'INVALID_PARAMS',
+          message: '验证参数不完整',
+          required: ['signature', 'timestamp', 'nonce', 'echostr'],
+          received: { signature: !!signature, timestamp: !!timestamp, nonce: !!nonce, echostr: !!echostr }
+        })
       }
       
       // 验证签名
@@ -81,13 +98,26 @@ export default async function handler(req, res) {
       console.log('- 微信签名:', signature)
       console.log('- 计算签名:', sha1)
       console.log('- 验证结果:', signature === sha1)
+      console.log('- Token:', token)
+      console.log('- 排序参数:', arr)
+      console.log('- 拼接字符串:', str)
       
       if (signature === sha1) {
         console.log('✅ 微信验证成功，返回echostr:', echostr)
         return res.status(200).send(echostr)
       } else {
         console.log('❌ 微信验证失败')
-        return res.status(403).send('验证失败')
+        return res.status(200).json({
+          error: 'SIGNATURE_FAILED',
+          message: '签名验证失败',
+          debug: {
+            received_signature: signature,
+            calculated_signature: sha1,
+            token: token,
+            timestamp: timestamp,
+            nonce: nonce
+          }
+        })
       }
     }
     

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微信接口测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-btn {
+            background: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 16px;
+        }
+        .test-btn:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 微信接口诊断工具</h1>
+        
+        <h3>基础接口测试</h3>
+        <button class="test-btn" onclick="testAPI()">测试 /api</button>
+        <button class="test-btn" onclick="testHealth()">测试 /api/health</button>
+        <button class="test-btn" onclick="testWechatBasic()">测试 /api/wechat (基础)</button>
+        <button class="test-btn" onclick="testWechatWithParams()">测试微信验证参数</button>
+        
+        <div id="results"></div>
+        
+        <h3>📋 配置信息</h3>
+        <div class="info">
+            <strong>服务器URL:</strong> https://baby-growth-recorder.vercel.app/api/wechat<br>
+            <strong>Token:</strong> babyGrowthRecord2024<br>
+            <strong>加密方式:</strong> 明文模式
+        </div>
+    </div>
+
+    <script>
+        function showResult(title, success, message, details = null) {
+            const resultDiv = document.getElementById('results');
+            const className = success ? 'success' : 'error';
+            const icon = success ? '✅' : '❌';
+            
+            let html = `<div class="result ${className}">
+                <strong>${icon} ${title}</strong><br>
+                ${message}`;
+            
+            if (details) {
+                html += `<br><br>详细信息：<br>${JSON.stringify(details, null, 2)}`;
+            }
+            
+            html += '</div>';
+            resultDiv.innerHTML += html;
+        }
+
+        async function testAPI() {
+            document.getElementById('results').innerHTML = '';
+            try {
+                const response = await fetch('/api');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('API根路径测试', true, `状态码: ${response.status}`, data);
+                } else {
+                    showResult('API根路径测试', false, `状态码: ${response.status}`, data);
+                }
+            } catch (error) {
+                showResult('API根路径测试', false, `连接错误: ${error.message}`);
+            }
+        }
+
+        async function testHealth() {
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'ok') {
+                    showResult('健康检查', true, `状态码: ${response.status}`, data);
+                } else {
+                    showResult('健康检查', false, `状态码: ${response.status}`, data);
+                }
+            } catch (error) {
+                showResult('健康检查', false, `连接错误: ${error.message}`);
+            }
+        }
+
+        async function testWechatBasic() {
+            try {
+                const response = await fetch('/api/wechat');
+                const text = await response.text();
+                
+                if (response.status === 403) {
+                    showResult('微信接口基础测试', true, 
+                        '接口正常响应403（缺少验证参数）', 
+                        { status: response.status, response: text });
+                } else {
+                    showResult('微信接口基础测试', false, 
+                        `意外状态码: ${response.status}`, 
+                        { status: response.status, response: text });
+                }
+            } catch (error) {
+                showResult('微信接口基础测试', false, `连接错误: ${error.message}`);
+            }
+        }
+
+        async function testWechatWithParams() {
+            // 模拟微信验证参数
+            const timestamp = Math.floor(Date.now() / 1000);
+            const nonce = 'test123';
+            const echostr = 'test_echo_string';
+            
+            // 简化签名计算（实际微信会用正确的签名）
+            const testParams = `signature=test_signature&timestamp=${timestamp}&nonce=${nonce}&echostr=${echostr}`;
+            
+            try {
+                const response = await fetch(`/api/wechat?${testParams}`);
+                const text = await response.text();
+                
+                showResult('微信验证参数测试', 
+                    response.status === 403, 
+                    `状态码: ${response.status} (403是预期的，因为签名不正确)`,
+                    { 
+                        url: `/api/wechat?${testParams}`,
+                        status: response.status, 
+                        response: text.substring(0, 200) 
+                    });
+            } catch (error) {
+                showResult('微信验证参数测试', false, `连接错误: ${error.message}`);
+            }
+        }
+
+        // 页面加载时自动运行基础测试
+        window.onload = function() {
+            testAPI();
+        };
+    </script>
+</body>
+</html> 
