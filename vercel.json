@@ -1,6 +1,16 @@
 {
   "version": 2,
   "public": true,
+  "name": "baby-growth-recorder",
+  "alias": ["baby-growth-recorder.vercel.app"],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "functions": {
+    "api/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
   "routes": [
     {
       "src": "/api/(.*)",
