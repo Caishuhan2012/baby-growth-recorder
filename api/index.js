@@ -8,11 +8,23 @@ const WECHAT_APPID = 'wx65271d6f2f1b3f21'
 export default async function handler(req, res) {
   const { method, url, query, body } = req
   
-  console.log(`${new Date().toISOString()} - ${method} ${url}`)
+  // 移除/api前缀来处理路径
+  const path = url.replace('/api', '') || '/'
+  
+  console.log(`${new Date().toISOString()} - ${method} ${path}`)
   console.log('Query:', query)
   
+  // 设置CORS
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  
+  if (method === 'OPTIONS') {
+    return res.status(200).end()
+  }
+  
   // 路由处理
-  if (url === '/' || url === '/index') {
+  if (path === '/' || path === '/index') {
     // 根路径
     const serverInfo = {
       message: '宝宝成长记录 - 微信公众号服务器',
@@ -20,8 +32,8 @@ export default async function handler(req, res) {
       status: 'running',
       timestamp: new Date().toISOString(),
       endpoints: {
-        wechat: '/wechat',
-        health: '/health'
+        wechat: '/api/wechat',
+        health: '/api/health'
       },
       config: {
         token: WECHAT_TOKEN ? '已配置' : '未配置',
@@ -33,7 +45,7 @@ export default async function handler(req, res) {
     return res.status(200).json(serverInfo)
   }
   
-  if (url === '/health') {
+  if (path === '/health') {
     // 健康检查接口
     const healthData = {
       status: 'ok',
@@ -47,7 +59,7 @@ export default async function handler(req, res) {
     return res.status(200).json(healthData)
   }
   
-  if (url === '/wechat') {
+  if (path === '/wechat') {
     if (method === 'GET') {
       // 微信服务器验证
       console.log('收到微信验证请求:', query)
@@ -170,14 +182,14 @@ export default async function handler(req, res) {
   }
   
   // 404处理
-  console.log('404 - 未找到路径:', url)
+  console.log('404 - 未找到路径:', path)
   return res.status(404).json({
     error: 'NOT_FOUND',
-    message: `路径 ${url} 未找到`,
+    message: `API路径 ${path} 未找到`,
     availableEndpoints: [
-      '/',
-      '/health', 
-      '/wechat'
+      '/api',
+      '/api/health', 
+      '/api/wechat'
     ],
     timestamp: new Date().toISOString()
   })

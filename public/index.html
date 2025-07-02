@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宝宝成长记录 - 微信公众号服务器</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #FF6B9D 0%, #C44569 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .api-links {
+            margin: 30px 0;
+        }
+        .api-link {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 25px;
+            margin: 10px;
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .api-link:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        .status {
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍼 宝宝成长记录</h1>
+        <p>微信公众号服务器正在运行</p>
+        
+        <div class="status">
+            <h3>📡 API 接口</h3>
+            <div class="api-links">
+                <a href="/api" class="api-link">🏠 服务器信息</a>
+                <a href="/api/health" class="api-link">❤️ 健康检查</a>
+                <a href="/api/wechat" class="api-link">📱 微信接口</a>
+            </div>
+        </div>
+        
+        <div class="status">
+            <h3>🔧 配置信息</h3>
+            <p>✅ Token: 已配置</p>
+            <p>✅ AppID: 已配置</p>
+            <p>✅ 版本: 1.0.0</p>
+        </div>
+        
+        <div class="status">
+            <h3>📖 使用说明</h3>
+            <p>将此服务器URL配置到微信公众号后台</p>
+            <p>Token: <code>babyGrowthRecord2024</code></p>
+        </div>
+    </div>
+    
+    <script>
+        // 自动测试API状态
+        fetch('/api')
+            .then(response => response.json())
+            .then(data => {
+                console.log('API测试成功:', data);
+            })
+            .catch(error => {
+                console.error('API测试失败:', error);
+            });
+    </script>
+</body>
+</html> 
