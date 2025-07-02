@@ -4,7 +4,11 @@ Page({
   data: {
     userInfo: {},
     loginStatus: '未登录',
-    babyInfo: {},
+    babyInfo: {
+      name: '',
+      birthday: '',
+      genderIndex: 0
+    },
     babyGenderText: '请设置',
     babyAge: { years: -1, months: 0 },
     
@@ -20,7 +24,15 @@ Page({
     showNameModal: false,
     showGenderModal: false,
     tempBabyName: '',
-    tempGender: ''
+    tempGender: '',
+    genderOptions: ['男孩', '女孩'],
+    storyStyles: ['温馨自然', '诗意优雅', '活泼可爱', '简洁记录'],
+    settings: {
+      storyStyleIndex: 0,
+      autoGenerateStory: true,
+      growthReminder: true,
+      dailyReminder: false
+    }
   },
 
   onLoad() {
@@ -72,30 +84,51 @@ Page({
 
   // 加载应用设置
   loadSettings() {
-    try {
-      const settings = wx.getStorageSync('appSettings') || {}
-      this.setData({
-        storyStyle: settings.storyStyle || '温暖优雅',
-        storyLength: settings.storyLength || 80,
-        autoTagging: settings.autoTagging !== false
-      })
-    } catch (error) {
-      console.error('加载设置失败:', error)
-    }
+    const settings = wx.getStorageSync('appSettings') || this.data.settings;
+    this.setData({ settings });
   },
 
   // 保存应用设置
   saveSettings() {
-    try {
-      const settings = {
-        storyStyle: this.data.storyStyle,
-        storyLength: this.data.storyLength,
-        autoTagging: this.data.autoTagging
-      }
-      wx.setStorageSync('appSettings', settings)
-    } catch (error) {
-      console.error('保存设置失败:', error)
+    // 验证必填信息
+    if (!this.data.babyInfo.name.trim()) {
+      wx.showToast({
+        title: '请输入宝宝姓名',
+        icon: 'none'
+      });
+      return;
     }
+
+    // 保存到本地存储
+    wx.setStorageSync('babyInfo', this.data.babyInfo);
+    wx.setStorageSync('appSettings', this.data.settings);
+
+    // 同步到云端
+    this.syncToCloud();
+
+    wx.showToast({
+      title: '设置已保存',
+      icon: 'success'
+    });
+  },
+
+  // 同步到云端
+  syncToCloud() {
+    const db = wx.cloud.database();
+    const userId = wx.getStorageSync('userId');
+    
+    if (!userId) return;
+
+    // 更新用户设置
+    db.collection('users').doc(userId).update({
+      data: {
+        babyInfo: this.data.babyInfo,
+        settings: this.data.settings,
+        updateTime: new Date()
+      }
+    }).catch(err => {
+      console.error('同步设置到云端失败:', err);
+    });
   },
 
   // 获取用户信息
@@ -138,7 +171,7 @@ Page({
 
   onNameInput(e) {
     this.setData({
-      tempBabyName: e.detail.value
+      'babyInfo.name': e.detail.value
     })
   },
 
@@ -239,7 +272,7 @@ Page({
   selectGender(e) {
     const gender = e.currentTarget.dataset.gender
     this.setData({
-      tempGender: gender
+      'babyInfo.genderIndex': parseInt(gender)
     })
   },
 
@@ -390,10 +423,11 @@ Page({
   // 关于我们
   showAbout() {
     wx.showModal({
-      title: '关于我们',
-      content: '宝宝成长记录 v2.0.0\n\n基于AI技术的智能成长记录小程序\n让每个美好瞬间都有温暖的故事',
-      showCancel: false
-    })
+      title: '关于花生成长记录',
+      content: '花生成长记录是一款AI驱动的宝宝成长记录应用，通过智能分析为您的宝宝生成温馨的成长故事。\n\n版本：v1.0.0\n开发者：花生团队',
+      showCancel: false,
+      confirmText: '我知道了'
+    });
   },
 
   // 联系我们
@@ -408,5 +442,64 @@ Page({
   // 阻止模态框关闭
   preventClose() {
     // 阻止事件冒泡
+  },
+
+  // 出生日期选择
+  onBirthdayChange(e) {
+    this.setData({
+      'babyInfo.birthday': e.detail.value
+    });
+  },
+
+  // 故事风格选择
+  onStoryStyleChange(e) {
+    this.setData({
+      'settings.storyStyleIndex': parseInt(e.detail.value)
+    });
+  },
+
+  // 自动生成故事开关
+  onAutoGenerateChange(e) {
+    this.setData({
+      'settings.autoGenerateStory': e.detail.value
+    });
+  },
+
+  // 成长提醒开关
+  onGrowthReminderChange(e) {
+    this.setData({
+      'settings.growthReminder': e.detail.value
+    });
+  },
+
+  // 每日记录提醒开关
+  onDailyReminderChange(e) {
+    this.setData({
+      'settings.dailyReminder': e.detail.value
+    });
+  },
+
+  // 清理缓存
+  clearCache() {
+    wx.showModal({
+      title: '确认清理',
+      content: '清理缓存会删除本地存储的临时数据，但不会影响云端记录',
+      success: (res) => {
+        if (res.confirm) {
+          // 清理本地缓存，但保留重要设置
+          const importantKeys = ['babyInfo', 'appSettings', 'userId'];
+          wx.getStorageInfoSync().keys.forEach(key => {
+            if (!importantKeys.includes(key)) {
+              wx.removeStorageSync(key);
+            }
+          });
+          
+          wx.showToast({
+            title: '缓存清理完成',
+            icon: 'success'
+          });
+        }
+      }
+    });
   }
 }) 

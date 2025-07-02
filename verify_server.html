@@ -1,36 +1,240 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <title>微信公众号服务器验证</title>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微信服务器验证</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .btn {
+            background: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+        pre {
+            background: #f1f3f4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-    <h1>微信公众号服务器验证工具</h1>
-    
-    <h2>🔧 配置信息</h2>
-    <div style="background: #f5f5f5; padding: 15px; border-radius: 5px;">
-        <p><strong>服务器URL</strong>：需要一个公网可访问的HTTPS地址</p>
-        <p><strong>Token</strong>：babyGrowthRecord2024</p>
-        <p><strong>EncodingAESKey</strong>：随机生成（在公众号后台点击生成）</p>
-        <p><strong>消息加解密方式</strong>：明文模式</p>
+    <div class="container">
+        <h1>🚀 微信公众号服务器验证</h1>
+        
+        <div class="test-section">
+            <h3>🔧 服务器状态检查</h3>
+            <button class="btn" onclick="testServer()">检查服务器状态</button>
+            <button class="btn" onclick="testHealth()">健康检查</button>
+            <button class="btn" onclick="testWechatEndpoint()">测试微信接口</button>
+            <div id="server-status"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📱 微信验证测试</h3>
+            <p>测试微信服务器验证功能（模拟微信服务器验证请求）</p>
+            <button class="btn" onclick="testWechatVerification()">模拟微信验证</button>
+            <div id="wechat-verification"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔗 部署信息</h3>
+            <div class="info">
+                <strong>Vercel部署域名：</strong> 
+                <span id="domain-name">加载中...</span>
+            </div>
+            <div class="info">
+                <strong>微信服务器URL：</strong> 
+                <span id="wechat-url">加载中...</span>
+            </div>
+            <div class="info">
+                <strong>Token：</strong> babyGrowthRecord2024
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 使用说明</h3>
+            <ol>
+                <li>确保所有测试都显示 ✅ 成功状态</li>
+                <li>复制微信服务器URL到微信公众号后台</li>
+                <li>使用Token: <code>babyGrowthRecord2024</code></li>
+                <li>在微信公众号后台进行服务器配置验证</li>
+            </ol>
+        </div>
     </div>
-    
-    <h2>📱 替代方案</h2>
-    <ol>
-        <li><strong>使用腾讯云函数</strong>：创建腾讯云账号，使用腾讯云的云函数服务</li>
-        <li><strong>使用Vercel/Netlify</strong>：免费的无服务器平台</li>
-        <li><strong>使用ngrok</strong>：本地开发时的内网穿透工具</li>
-        <li><strong>使用小程序内模拟器</strong>：在聊天页面测试功能</li>
-    </ol>
-    
-    <h2>🎯 推荐方案：使用小程序内模拟器</h2>
-    <p>由于配置真实微信服务器比较复杂，建议先使用小程序内置的模拟器测试功能：</p>
-    <ol>
-        <li>打开小程序的"聊天记录"页面</li>
-        <li>找到"📱 微信助手模拟器"</li>
-        <li>选择照片、输入描述</li>
-        <li>点击"🚀 模拟发送到微信助手"</li>
-        <li>查看AI处理结果</li>
-    </ol>
+
+    <script>
+        // 获取当前域名
+        const currentDomain = window.location.origin;
+        document.getElementById('domain-name').textContent = currentDomain;
+        document.getElementById('wechat-url').textContent = currentDomain + '/wechat';
+
+        function showLoading(elementId) {
+            document.getElementById(elementId).innerHTML = '<div class="loading"></div> 测试中...';
+        }
+
+        function showResult(elementId, success, message, data = null) {
+            const statusClass = success ? 'success' : 'error';
+            const icon = success ? '✅' : '❌';
+            let html = `<div class="${statusClass}">${icon} ${message}</div>`;
+            
+            if (data) {
+                html += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            }
+            
+            document.getElementById(elementId).innerHTML = html;
+        }
+
+        async function testServer() {
+            showLoading('server-status');
+            try {
+                const response = await fetch('/');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('server-status', true, '服务器运行正常', data);
+                } else {
+                    showResult('server-status', false, `服务器错误: ${response.status}`, data);
+                }
+            } catch (error) {
+                showResult('server-status', false, `连接失败: ${error.message}`);
+            }
+        }
+
+        async function testHealth() {
+            showLoading('server-status');
+            try {
+                const response = await fetch('/health');
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'ok') {
+                    showResult('server-status', true, '健康检查通过', data);
+                } else {
+                    showResult('server-status', false, '健康检查失败', data);
+                }
+            } catch (error) {
+                showResult('server-status', false, `健康检查连接失败: ${error.message}`);
+            }
+        }
+
+        async function testWechatEndpoint() {
+            showLoading('server-status');
+            try {
+                const response = await fetch('/wechat');
+                
+                if (response.status === 403) {
+                    showResult('server-status', true, '微信接口正常（需要验证参数）', 
+                        { message: '接口可访问，等待微信验证参数' });
+                } else {
+                    const text = await response.text();
+                    showResult('server-status', false, `微信接口异常: ${response.status}`, 
+                        { response: text });
+                }
+            } catch (error) {
+                showResult('server-status', false, `微信接口连接失败: ${error.message}`);
+            }
+        }
+
+        async function testWechatVerification() {
+            showLoading('wechat-verification');
+            
+            // 模拟微信验证参数
+            const timestamp = Math.floor(Date.now() / 1000);
+            const nonce = Math.random().toString(36).substring(7);
+            const echostr = 'test_echo_string';
+            
+            // 计算签名（这里简化处理，实际应该按微信规则计算）
+            const token = 'babyGrowthRecord2024';
+            const params = [token, timestamp, nonce].sort().join('');
+            
+            try {
+                const testUrl = `/wechat?signature=test&timestamp=${timestamp}&nonce=${nonce}&echostr=${echostr}`;
+                const response = await fetch(testUrl);
+                const text = await response.text();
+                
+                if (response.ok) {
+                    showResult('wechat-verification', true, '微信验证接口响应正常', 
+                        { 
+                            testUrl: testUrl,
+                            response: text,
+                            note: '实际使用时需要正确的签名计算'
+                        });
+                } else {
+                    showResult('wechat-verification', false, `验证失败: ${response.status}`, 
+                        { response: text });
+                }
+            } catch (error) {
+                showResult('wechat-verification', false, `验证请求失败: ${error.message}`);
+            }
+        }
+
+        // 页面加载时自动测试服务器状态
+        window.onload = function() {
+            testServer();
+        };
+    </script>
 </body>
 </html> 

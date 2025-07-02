@@ -7,15 +7,6 @@ const app = express()
 // 配置中间件
 app.use(bodyParser.text({ type: 'text/xml' }))
 app.use(bodyParser.urlencoded({ extended: true }))
-app.use(express.json())
-
-// 添加请求日志中间件
-app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`)
-  console.log('Query:', req.query)
-  console.log('Headers:', req.headers)
-  next()
-})
 
 // 微信公众号配置
 const WECHAT_TOKEN = 'babyGrowthRecord2024'
@@ -143,77 +134,33 @@ app.post('/wechat', async (req, res) => {
  * 健康检查接口
  */
 app.get('/health', (req, res) => {
-  const healthData = {
+  res.json({
     status: 'ok',
     message: '微信公众号服务器运行正常',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development',
-    version: '1.0.0'
-  }
-  
-  console.log('健康检查请求:', healthData)
-  res.json(healthData)
+    timestamp: new Date().toISOString()
+  })
 })
 
 /**
  * 根路径
  */
 app.get('/', (req, res) => {
-  const serverInfo = {
+  res.json({
     message: '宝宝成长记录 - 微信公众号服务器',
     version: '1.0.0',
-    status: 'running',
-    timestamp: new Date().toISOString(),
     endpoints: {
       wechat: '/wechat',
       health: '/health'
-    },
-    config: {
-      token: WECHAT_TOKEN ? '已配置' : '未配置',
-      appid: WECHAT_APPID ? '已配置' : '未配置'
     }
-  }
-  
-  console.log('根路径访问:', serverInfo)
-  res.json(serverInfo)
-})
-
-// 404错误处理
-app.use('*', (req, res) => {
-  console.log('404 - 未找到路径:', req.originalUrl)
-  res.status(404).json({
-    error: 'NOT_FOUND',
-    message: `路径 ${req.originalUrl} 未找到`,
-    availableEndpoints: [
-      '/',
-      '/health', 
-      '/wechat'
-    ],
-    timestamp: new Date().toISOString()
   })
 })
 
-// 全局错误处理
-app.use((error, req, res, next) => {
-  console.error('服务器错误:', error)
-  res.status(500).json({
-    error: 'INTERNAL_SERVER_ERROR',
-    message: '服务器内部错误',
-    timestamp: new Date().toISOString()
-  })
-})
-
-// Vercel导出函数
-module.exports = app
-
-// 本地开发启动服务器
-if (require.main === module) {
-  const PORT = process.env.PORT || 3000
-  app.listen(PORT, () => {
-    console.log(`🚀 服务器启动成功！`)
-    console.log(`📍 端口: ${PORT}`)
-    console.log(`🔗 访问地址: http://localhost:${PORT}`)
-    console.log(`📱 微信接口: /wechat`)
-    console.log(`❤️  健康检查: /health`)
-  })
-} 
+// 启动服务器
+const PORT = process.env.PORT || 80
+app.listen(PORT, () => {
+  console.log(`🚀 服务器启动成功！`)
+  console.log(`📍 端口: ${PORT}`)
+  console.log(`🔗 访问地址: http://localhost:${PORT}`)
+  console.log(`📱 微信接口: /wechat`)
+  console.log(`❤️  健康检查: /health`)
+}) 
