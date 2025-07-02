@@ -61,11 +61,18 @@ export default async function handler(req, res) {
   }
   
   if (path === '/wechat') {
+    // 微信验证和消息处理
+    console.log('微信接口请求:', method)
+    
     if (method === 'GET') {
       // 微信服务器验证
-      console.log('收到微信验证请求:', query)
-      
       const { signature, timestamp, nonce, echostr } = query
+      
+      console.log('微信验证参数:')
+      console.log('- signature:', signature)
+      console.log('- timestamp:', timestamp) 
+      console.log('- nonce:', nonce)
+      console.log('- echostr:', echostr)
       
       // 检查是否有微信验证参数
       if (!signature && !timestamp && !nonce && !echostr) {
@@ -78,52 +85,42 @@ export default async function handler(req, res) {
         })
       }
       
+      // 必须有所有验证参数
       if (!signature || !timestamp || !nonce || !echostr) {
         console.log('❌ 缺少部分验证参数')
-        return res.status(400).json({
-          error: 'INVALID_PARAMS',
-          message: '验证参数不完整',
-          required: ['signature', 'timestamp', 'nonce', 'echostr'],
-          received: { signature: !!signature, timestamp: !!timestamp, nonce: !!nonce, echostr: !!echostr }
-        })
+        return res.status(200).send('error: missing parameters')
       }
       
-      // 验证签名
-      const token = WECHAT_TOKEN
-      const arr = [token, timestamp, nonce].sort()
-      const str = arr.join('')
-      const sha1 = crypto.createHash('sha1').update(str).digest('hex')
-      
-      console.log('签名验证:')
-      console.log('- 微信签名:', signature)
-      console.log('- 计算签名:', sha1)
-      console.log('- 验证结果:', signature === sha1)
-      console.log('- Token:', token)
-      console.log('- 排序参数:', arr)
-      console.log('- 拼接字符串:', str)
-      
-      if (signature === sha1) {
-        console.log('✅ 微信验证成功，返回echostr:', echostr)
-        return res.status(200).send(echostr)
-      } else {
-        console.log('❌ 微信验证失败')
-        return res.status(200).json({
-          error: 'SIGNATURE_FAILED',
-          message: '签名验证失败',
-          debug: {
-            received_signature: signature,
-            calculated_signature: sha1,
-            token: token,
-            timestamp: timestamp,
-            nonce: nonce
-          }
-        })
+      try {
+        // 验证签名
+        const token = WECHAT_TOKEN
+        const arr = [token, timestamp, nonce].sort()
+        const str = arr.join('')
+        const sha1 = crypto.createHash('sha1').update(str).digest('hex')
+        
+        console.log('签名计算过程:')
+        console.log('- Token:', token)
+        console.log('- 排序后数组:', arr)
+        console.log('- 拼接字符串:', str)
+        console.log('- 计算SHA1:', sha1)
+        console.log('- 微信签名:', signature)
+        console.log('- 验证结果:', signature === sha1)
+        
+        if (signature === sha1) {
+          console.log('✅ 验证成功，返回echostr:', echostr)
+          return res.status(200).send(echostr)
+        } else {
+          console.log('❌ 签名验证失败')
+          return res.status(200).send('error: signature verification failed')
+        }
+      } catch (error) {
+        console.error('验证过程出错:', error)
+        return res.status(200).send('error: internal server error')
       }
-    }
-    
-    if (method === 'POST') {
-      // 接收微信消息
-      console.log('收到微信消息:', body)
+    } else if (method === 'POST') {
+      // POST请求处理消息
+      console.log('收到POST微信消息请求')
+      console.log('消息内容:', body)
       
       try {
         // 解析XML消息
@@ -138,51 +135,7 @@ export default async function handler(req, res) {
         const msgType = message.MsgType[0]
         const createTime = Math.floor(Date.now() / 1000)
         
-        let replyMsg = ''
-        
-        // 处理不同类型的消息
-        if (msgType === 'text') {
-          const content = message.Content[0]
-          console.log('收到文本消息:', content)
-          
-          if (content.includes('帮助') || content.includes('教程')) {
-            replyMsg = `🤖 宝宝成长记录助手
-
-📸 使用方法：
-1. 发送宝宝照片
-2. 发送文字描述
-3. AI自动生成成长故事
-4. 在小程序中查看记录
-
-💡 示例：
-发送照片后输入"宝宝今天第一次笑了"
-
-🔗 打开小程序查看完整记录`
-          } else {
-            replyMsg = `👋 你好！
-
-📱 这是宝宝成长记录助手
-📸 请发送宝宝照片开始记录成长时刻
-❓ 回复"帮助"查看使用教程
-
-🎯 让AI帮你记录宝宝的每个珍贵瞬间！`
-          }
-        } else if (msgType === 'image') {
-          const mediaId = message.MediaId[0]
-          console.log('收到图片消息, MediaId:', mediaId)
-          
-          replyMsg = `📸 收到照片！
-
-🤖 AI正在分析中...
-✍️ 请发送文字描述来完善这个成长记录
-
-💡 例如："宝宝今天学会爬了，好开心！"`
-        } else {
-          replyMsg = `🤖 抱歉，我只能处理文字和图片消息
-
-📸 请发送宝宝照片开始记录
-❓ 回复"帮助"查看使用教程`
-        }
+        let replyMsg = '👋 你好！这是宝宝成长记录助手，功能正在开发中...'
         
         // 构造回复消息XML
         const replyXml = `<xml>
@@ -201,14 +154,10 @@ export default async function handler(req, res) {
         console.error('处理消息失败:', error)
         return res.status(200).send('success')
       }
+    } else {
+      console.log('不支持的请求方法:', method)
+      return res.status(200).send('error: method not allowed')
     }
-    
-    // 不支持的方法
-    return res.status(405).json({
-      error: 'METHOD_NOT_ALLOWED',
-      message: '不支持的请求方法',
-      allowedMethods: ['GET', 'POST']
-    })
   }
   
   // 404处理
