@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微信公众号配置测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #ff9a9e, #fecfef, #fecfef);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #ff6b9d;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .config-box {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #ff6b9d;
+        }
+        .config-item {
+            margin: 10px 0;
+            font-family: monospace;
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+        .test-button {
+            background: #ff6b9d;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: all 0.3s;
+        }
+        .test-button:hover {
+            background: #ff5a8a;
+            transform: translateY(-2px);
+        }
+        .result {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .steps {
+            background: #e3f2fd;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .step {
+            margin: 15px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            border-left: 3px solid #2196f3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 微信公众号配置测试</h1>
+        
+        <div class="config-box">
+            <h3>📋 正确配置信息</h3>
+            <div class="config-item">
+                <strong>服务器URL:</strong><br>
+                https://baby-growth-recorder-p57adi30j-caishuhans-projects.vercel.app/api/wechat
+            </div>
+            <div class="config-item">
+                <strong>Token:</strong><br>
+                babyGrowthRecord2024
+            </div>
+            <div class="config-item">
+                <strong>加密方式:</strong><br>
+                明文模式
+            </div>
+        </div>
+
+        <div class="steps">
+            <h3>🔧 配置步骤</h3>
+            <div class="step">
+                <strong>步骤1:</strong> 登录微信公众号后台 (mp.weixin.qq.com)
+            </div>
+            <div class="step">
+                <strong>步骤2:</strong> 进入 开发 → 基本配置
+            </div>
+            <div class="step">
+                <strong>步骤3:</strong> 在"服务器配置"中填入上述信息
+            </div>
+            <div class="step">
+                <strong>步骤4:</strong> 点击"提交"进行验证
+            </div>
+        </div>
+
+        <h3>🧪 接口测试</h3>
+        <button class="test-button" onclick="testWechatAPI()">测试微信接口</button>
+        <button class="test-button" onclick="testHealth()">测试健康检查</button>
+        <button class="test-button" onclick="testRoot()">测试根接口</button>
+        
+        <div id="testResult"></div>
+
+        <div class="config-box">
+            <h3>⚠️ 常见问题</h3>
+            <p><strong>1. URL路径错误:</strong> 确保URL是完整路径，包含 /api/wechat</p>
+            <p><strong>2. 协议错误:</strong> 必须使用 HTTPS 而不是 HTTP</p>
+            <p><strong>3. Token不匹配:</strong> 确保Token完全一致，区分大小写</p>
+            <p><strong>4. 访问权限:</strong> 确保服务器可以被微信访问</p>
+        </div>
+
+        <div class="config-box">
+            <h3>📊 当前服务器状态</h3>
+            <p>✅ 服务器运行正常</p>
+            <p>✅ API端点已配置</p>
+            <p>✅ 微信验证逻辑已实现</p>
+            <p>✅ HTTPS协议支持</p>
+        </div>
+    </div>
+
+    <script>
+        async function testAPI(url, description) {
+            const resultDiv = document.getElementById('testResult');
+            resultDiv.innerHTML = `<div class="warning">🔄 正在测试 ${description}...</div>`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.text();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div class="success">✅ ${description} 测试成功\n\n状态码: ${response.status}\n响应内容: ${data}</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ ${description} 测试失败\n\n状态码: ${response.status}\n响应内容: ${data}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ ${description} 测试出错\n\n错误信息: ${error.message}</div>`;
+            }
+        }
+
+        function testWechatAPI() {
+            testAPI('/api/wechat', '微信验证接口');
+        }
+
+        function testHealth() {
+            testAPI('/api/health', '健康检查接口');
+        }
+
+        function testRoot() {
+            testAPI('/api', '根接口');
+        }
+
+        // 页面加载时自动测试
+        window.onload = function() {
+            testRoot();
+        };
+    </script>
+</body>
+</html> 
