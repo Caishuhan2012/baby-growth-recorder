@@ -1,35 +1,9 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "server/index.js",
-      "use": "@vercel/node",
-      "config": {
-        "maxLambdaSize": "50mb"
-      }
-    }
-  ],
   "routes": [
     {
-      "src": "/health",
-      "dest": "server/index.js"
-    },
-    {
-      "src": "/wechat",
-      "dest": "server/index.js"
-    },
-    {
-      "src": "/",
-      "dest": "server/index.js"
-    },
-    {
       "src": "/(.*)",
-      "dest": "server/index.js"
+      "dest": "/api"
     }
-  ],
-  "functions": {
-    "server/index.js": {
-      "maxDuration": 30
-    }
-  }
+  ]
 } 
