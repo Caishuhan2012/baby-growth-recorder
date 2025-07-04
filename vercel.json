@@ -15,8 +15,7 @@
   ],
   "functions": {
     "api/wechat-handler.js": {
-      "runtime": "nodejs20.x",
-      "maxDuration": 30
+      "runtime": "nodejs20.x"
     },
     "api/wechat.js": {
       "runtime": "nodejs20.x",
