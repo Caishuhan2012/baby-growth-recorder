@@ -16,7 +16,7 @@ exports.main = async (event, context) => {
   console.log('aiProcessor 云函数开始执行', event)
   
   try {
-    const { imageUrl, userText, openid, timestamp } = event
+    const { imageUrl, userText, openid, timestamp, source, messageId } = event
     
     // 1. 使用腾讯云AI识别图片内容（模拟实现）
     const imageAnalysis = await analyzeImage(imageUrl)
@@ -38,6 +38,8 @@ exports.main = async (event, context) => {
       tags,
       imageAnalysis,
       openid,
+      source: source || 'unknown', // 记录来源：wechat/chat/manual
+      messageId: messageId || null, // 微信消息ID
       timestamp: timestamp || new Date(),
       createTime: db.serverDate()
     }

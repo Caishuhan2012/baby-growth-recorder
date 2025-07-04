@@ -11,5 +11,15 @@
       "src": "/(.*)",
       "dest": "server/index.js"
     }
-  ]
+  ],
+  "functions": {
+    "api/wechat-handler.js": {
+      "runtime": "nodejs18.x",
+      "maxDuration": 30
+    },
+    "api/wechat.js": {
+      "runtime": "nodejs18.x",
+      "maxDuration": 10
+    }
+  }
 } 

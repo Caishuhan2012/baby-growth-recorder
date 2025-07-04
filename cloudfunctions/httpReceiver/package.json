@@ -1,0 +1,9 @@
+{
+  "name": "httpReceiver",
+  "version": "1.0.0",
+  "description": "HTTP接收器云函数，接收来自Vercel的微信消息数据",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+} 

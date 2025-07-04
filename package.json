@@ -6,10 +6,13 @@
   "scripts": {
     "dev": "vercel dev",
     "build": "echo 'No build step required'",
-    "start": "vercel dev"
+    "start": "vercel dev",
+    "check-config": "node check_config.js"
   },
   "dependencies": {
-    "xml2js": "^0.6.2"
+    "xml2js": "^0.6.2",
+    "axios": "^1.6.0",
+    "crypto": "^1.0.1"
   },
   "engines": {
     "node": ">=14.0.0"
