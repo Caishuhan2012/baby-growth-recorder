@@ -8,6 +8,10 @@
   },
   "routes": [
     {
+      "src": "/api/wechat-handler",
+      "dest": "/api/wechat-handler.js"
+    },
+    {
       "src": "/api/wechat",
       "dest": "/api/wechat.js"
     },
@@ -22,6 +26,35 @@
     {
       "src": "/(.*)",
       "dest": "/public/$1"
+    }
+  ],
+  "functions": {
+    "api/wechat-handler.js": {
+      "runtime": "nodejs18.x",
+      "maxDuration": 30
+    },
+    "api/wechat.js": {
+      "runtime": "nodejs18.x",
+      "maxDuration": 10
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/wechat-handler",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
+        }
+      ]
     }
   ]
 } 
